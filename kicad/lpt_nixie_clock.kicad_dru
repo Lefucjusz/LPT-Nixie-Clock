@@ -1,0 +1,6 @@
+(version 1)
+
+(rule "HV_20mil"
+    (condition "A.NetName == '+170V' || A.NetName == 'Net-(D1-A)' || B.NetName == '+170V' || B.NetName == 'Net-(D1-A)'")
+    (constraint clearance (min 0.6096mm))
+)
