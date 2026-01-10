@@ -103,6 +103,10 @@ choice made it easy to make good use of the components I already had on hand.
 For the anode drivers, I usually go with the classic solution of a two-transistor high-side switch, which allows controlling high voltages using standard logic levels.
 
 <img src="img/high_side_switch.jpg" title="Two-transistor high side switch" alt="Two-transistor high side switch" width=270 />
+<figcaption><i>Two-transistor high side switch</i></figcaption>
+
+<br />
+<br />
 
 This time, however, I decided to experiment with an approach using optocouplers. I had seen similar solutions in other projects, but they typically used TLP627
 optocouplers or alternatives with a similarly high collector-emitter breakdown voltage `VCEO ≈ 300V`. They are much harder to source than common, widely
@@ -174,7 +178,11 @@ However, these terminals cannot be used as-is - they require slight modification
 2. Check the fit in the PCB pad. Some terminals have a slightly oversized diameter. If a terminal does not fit easily, gently squeeze the soldering end with pliers to reduce
 the diameter.
 
-<img src="img/terminal.jpg" title="Modified Molex terminal" alt="Modified Molex terminal" width=270 />
+<img src="img/terminal.jpg" title="Modified Molex terminal" alt="Modified Molex terminal" width=480 />
+<figcaption><i>Molex terminal with cable crimp section removed</i></figcaption>
+
+<br />
+<br />
 
 Perform these two steps on all terminals before proceeding, so that they are ready for installation.
 
@@ -190,6 +198,12 @@ After all the terminals have been soldered, install the neon bulbs, then insert 
 
 When the assembly is completed, clean the PCB thoroughly using isopropyl alcohol to remove any residual flux. Perform a careful final inspection: check for bad solder joints,
 accidental solder bridges or any potential shorts. Make sure all ICs are correctly oriented and look for any obvious mistakes before powering up the board.
+
+<img src="img/top_assembled.png" title="Fully assembled PCB - top view" alt="Fully assembled PCB - top view" width=480 />
+<figcaption><i>Fully assembled PCB - top view</i></figcaption>
+
+<br />
+<br />
 
 ### Bring-up
 
