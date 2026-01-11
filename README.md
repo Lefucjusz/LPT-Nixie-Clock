@@ -1,6 +1,11 @@
 # LPT-Nixie-Clock
 DOS-controlled Nixie clock, built with four IN-1/LC-516 tubes and interfaced through the LPT port.
 
+<figure>
+    <img src="img/complete_project.jpg" title="Photo of a complete project (LC-516 tubes)" alt="Photo of a complete project (LC-516 tubes)" width=400 />
+    <figcaption><i>Photo of a complete project (LC-516 tubes)</i></figcaption>
+</figure>
+
 ## Features
 * Supports IN-1 and LC-516 Nixie tubes
 * Multiplexed display with four digits and a colon
@@ -107,6 +112,9 @@ For the anode drivers, I usually go with the classic solution of a two-transisto
     <figcaption><i>Two-transistor high side switch</i></figcaption>
 </figure>
 
+<br/>
+<br/>
+
 This time, however, I decided to experiment with an approach using optocouplers. I had seen similar solutions in other projects, but they typically used TLP627
 optocouplers or alternatives with a similarly high collector-emitter breakdown voltage `VCEO ≈ 300V`. They are much harder to source than common, widely
 available types.
@@ -178,9 +186,12 @@ However, these contacts cannot be used as-is - they require slight modification 
 the diameter.
 
 <figure>
-    <img src="img/contact.jpg" title="Modified Molex contact" alt="Modified Molex contact" width=480 />
+    <img src="img/contact.jpg" title="Modified Molex contact" alt="Modified Molex contact" width=400 />
     <figcaption><i>Molex contact with cable crimp section removed</i></figcaption>
 </figure>
+
+<br/>
+<br/>
 
 Perform these two steps on all contacts before proceeding, so that they are ready for installation.
 
@@ -198,7 +209,7 @@ When the assembly is completed, clean the PCB thoroughly using isopropyl alcohol
 accidental solder bridges or any potential shorts. Make sure all ICs are correctly oriented and look for any obvious mistakes before powering up the board.
 
 <figure>
-    <img src="img/top_assembled.png" title="Fully assembled PCB - top view" alt="Fully assembled PCB - top view" width=480 />
+    <img src="img/top_assembled.png" title="Fully assembled PCB - top view" alt="Fully assembled PCB - top view" width=400 />
     <figcaption><i>Fully assembled PCB - top view</i></figcaption>
 </figure>
 
@@ -272,7 +283,6 @@ order for PCBs. As a result, typical 100nF ceramic disc capacitors are too narro
 I ever order another batch of PCBs, and (assuming the corrected version works as expected) I’ll update the design files.
 
 ### Bill of Materials
-
 | Component type | Reference          | Description                                 | Quantity | Possible sources and notes                                          |
 |----------------|--------------------|---------------------------------------------|----------|---------------------------------------------------------------------|
 | PCB            | -                  | LPT Nixie Clock PCB                         | 1        | Your favourite PCB manufacturer                                     |
@@ -323,5 +333,81 @@ I ever order another batch of PCBs, and (assuming the corrected version works as
 | Power supply   | -                  | 9-12VDC 0.5A power supply                   | 1        | TME POSC12100A-25                                                   |
 
 ## Software
+The program was developed on the Xi8088 using Borland Turbo Assembler 2.01. Initially, I considered implementing it in C, as this is my mother tongue in programming :smile:.
+However, I decided it would be more interesting to go fully low-level, try 8088 assembly, and minimize the size of the TSR as much as possible.
 
-*In progress...*
+To keep the design simple, I did not implement any unloading or presence-checking mechanisms. I also didn't explore loading the program into upper memory. My Xi8088 build has
+only 640KB of RAM, so I neither had a practical need for this nor a convenient way to test it. The final TSR occupies 720B of conventional memory.
+
+<figure>
+    <img src="img/mem.jpg" title="TSR memory usage" alt="TSR memory usage" width=400 />
+    <figcaption><i>TSR memory usage</i></figcaption>
+</figure>
+
+### Principle of operation
+At a high level, the program’s functionality is straightforward. Upon startup, it installs an interrupt handler for the RTC interrupt, configures the RTC interrupts and
+terminates. From that point on, the RTC periodically invokes the installed handler, which is responsible for updating the display.
+
+Internally, the program follows a fairly standard DOS TSR architecture and can be logically divided into an initialization part and a resident part. The initialization part runs
+when the program is executed and is responsible for the following tasks:
+* installing an interrupt handler for INT 70h (IRQ 8, connected to the RTC interrupt line), which effectively drives the entire resident part of the program;
+* configuring the RTC periodic interrupt rate to 256Hz, which is used as the display multiplexing timebase;
+* enabling the RTC update-ended interrupt, used to update the colon state and time variables;
+* unmasking IRQ 8 in the 8259 PIC;
+* terminating the program in a way that leaves the resident portion in memory.
+
+The resident part is the core of the program. Each time the RTC asserts an interrupt request, the installed ISR is invoked and executes the following steps:
+* all registers clobbered by the ISR are pushed onto the stack;
+* the RTC interrupt flags are read to determine the interrupt source;
+* if a periodic interrupt is pending, the display update procedure is executed; this procedure keeps track of the currently active Nixie tube to perform multiplexing, converts
+the time variables into the serial control word format, transmits the data frame via the LPT port, and executes the cathode depoisoning algorithm (described below);
+* if an update-ended interrupt is pending, the time update procedure is called; this procedure keeps the time variables and colon state synchronized with the RTC;
+* finally, IRQ 8 is acknowledged in the 8259 PICs, register values are restored from the stack, and the ISR returns.
+
+#### Cathode depoisoning algorithm
+The purpose of this algorithm is to prevent (or at least reduce) a well-known phenomenon inherent to Nixie tube technology. When a cathode (digit) is active, material from
+that cathode is sputtered onto the glass envelope and onto the inactive cathodes. If certain digits remain unused for long periods while others are displayed frequently, the
+deposited material can become thick enough to disturb the current flow, causing so-called cathode poisoning. A poisoned cathode may glow very weakly, develop dark spots or
+stop glowing altogether. Some excellent photographs illustrating this phenomenon can be found on [Dieter's Nixie World page](https://www.tube-tester.com/sites/nixie/different/cathode%20poisoning/cathode-poisoning.htm).
+
+Some Nixie tubes are more prone to this than others, but over time the effect can show up in almost any tube if it is not actively prevented.
+
+To counter this, a simple cathode “depoisoning” algorithm is implemented in the TSR. Once per hour, the algorithm cycles through all digits on all tubes, ensuring that every
+cathode is periodically activated. This is a standard approach and one I have used in my Nixie-related projects from the beginning. It has proven very effective for IN-12 and
+LC-531 tubes. I haven't had a long-term experience with IN-1 tubes yet, but I expect it to work just as well - time will tell :smile:.
+
+<figure>
+  <img src="img/depoisoning.gif" alt="Depoisoning algorithm at work (IN-1 tubes)">
+  <figcaption><i>Depoisoning algorithm at work (IN-1 tubes)</i></figcaption>
+</figure>
+
+### Compatibility
+The software has not been tested on a wide range of machines, but it should work on any system with:
+* an LPT port located at I/O address 378h and,
+* an AT-style RTC using the MC146818P / DS1287 programming model.
+
+In addition to the Xi8088 used for development, the program has been tested on a 386-class PC, where it worked without issues.
+
+In principle, the software could be adapted to systems without such an RTC. The display update routine needs to be invoked at a rate of at least 250Hz to maintain smooth
+multiplexing and an alternative time source would need to be provided.
+
+The TSR uses the RTC interrupt exclusively; the original ISR previously installed on the RTC vector is replaced rather than chained. This is probably not the wisest design choice,
+but as far as I am aware, DOS itself doesn't use this interrupt for any purpose. Problems may arise if other software expects to receive RTC interrupts.
+Unfortunately, I don't know which programs might rely on this, as my retrocomputing experience is still fairly limited.
+
+### Compiling
+Assuming Borland Turbo Assembler 2.01 is installed and added to system PATH, the program can be assembled as follows.
+
+1. Assemble the source file `CLOCK.ASM` using `TASM`:
+```
+tasm clock.asm
+```
+This will produce the object file `CLOCK.OBJ`.
+
+2. Link the object file using `TLINK`:
+```
+tlink /t clock.obj
+```
+The `/t` switch tells the linker to use the tiny memory model and generate a `.COM` file instead of an `.EXE`.
+
+If both commands run without errors, the output `CLOCK.COM` file will be created and is ready to run.
