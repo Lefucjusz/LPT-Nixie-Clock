@@ -102,11 +102,10 @@ choice made it easy to make good use of the components I already had on hand.
 #### Anode drivers
 For the anode drivers, I usually go with the classic solution of a two-transistor high-side switch, which allows controlling high voltages using standard logic levels.
 
-<img src="img/high_side_switch.jpg" title="Two-transistor high side switch" alt="Two-transistor high side switch" width=270 />
-<figcaption><i>Two-transistor high side switch</i></figcaption>
-
-<br />
-<br />
+<figure>
+    <img src="img/high_side_switch.jpg" title="Two-transistor high side switch" alt="Two-transistor high side switch" width=270 />
+    <figcaption><i>Two-transistor high side switch</i></figcaption>
+</figure>
 
 This time, however, I decided to experiment with an approach using optocouplers. I had seen similar solutions in other projects, but they typically used TLP627
 optocouplers or alternatives with a similarly high collector-emitter breakdown voltage `VCEO ≈ 300V`. They are much harder to source than common, widely
@@ -147,12 +146,12 @@ reference being based on forward voltage of feedback transistor's B-E junction, 
 
 Despite these limitations, I chose this approach for one main reason: it is simple and relies only on widely available components.
 
-### PCB assembly
+### Assembly
 
 > [!WARNING]
 > Nixie tubes and neon bulbs are mounted on the opposite side of the PCB from the rest of the components.
 
-#### Top side
+#### PCB - top side
 
 The top side of the PCB contains all components except the Nixie tubes and neon bulbs. When assembling this layer, install the components from the smallest to the largest -
 this makes the process much easier.
@@ -161,7 +160,7 @@ Pay close attention to the polarity of diodes and electrolytic capacitors, and e
 from the rest. I strongly recommend using sockets for all ICs. I use them in all of my projects: they are inexpensive and can save a lot of soldering work if any IC ever
 needs to be replaced.
 
-#### Bottom side
+#### PCB - bottom side
 The bottom side of the PCB is where the Nixie tubes and neon bulbs are mounted. Start by installing the Nixie tubes. They can be either soldered directly to the PCB or
 socketed. Both approaches have their advantages and drawbacks:
 * direct soldering is quicker, but replacing a tube later will be difficult and will require desoldering;
@@ -170,45 +169,61 @@ socketed. Both approaches have their advantages and drawbacks:
 If you decide to solder the tubes directly, there is not much to watch out for - the tube base is keyed, so simply align it correctly, insert it into the PCB, and solder.
 
 If you decide to use sockets, the process is a bit more complicated. Unfortunately, Nixie tube sockets were never standardized and are no longer manufactured, so they are
-not available as off-the-shelf parts. For this design, I used female terminals intended for 5.08mm Molex-type CD/HDD power connectors. These are widely available and likely to
+not available as off-the-shelf parts. For this design, I used female contacts intended for 5.08mm Molex-type CD/HDD power plugs. These are widely available and likely to
 remain so for the foreseeable future.
 
-However, these terminals cannot be used as-is - they require slight modification to fit the circular pads on the PCB. This is the most tedious part of the socketing process:
-1. Remove the cable crimp section of the terminal by cutting or breaking it off. Its irregular shape prevents the terminal from fitting properly into the circular PCB pad.
-2. Check the fit in the PCB pad. Some terminals have a slightly oversized diameter. If a terminal does not fit easily, gently squeeze the soldering end with pliers to reduce
+However, these contacts cannot be used as-is - they require slight modification to fit the circular pads on the PCB. This is the most tedious part of the socketing process:
+1. Remove the cable crimp section of the contact by cutting or breaking it off. Its irregular shape prevents the contact from fitting properly into the circular PCB pad.
+2. Check the fit in the PCB pad. Some contacts have a slightly oversized diameter. If a contact does not fit easily, gently squeeze the soldering end with pliers to reduce
 the diameter.
 
-<img src="img/terminal.jpg" title="Modified Molex terminal" alt="Modified Molex terminal" width=480 />
-<figcaption><i>Molex terminal with cable crimp section removed</i></figcaption>
+<figure>
+    <img src="img/contact.jpg" title="Modified Molex contact" alt="Modified Molex contact" width=480 />
+    <figcaption><i>Molex contact with cable crimp section removed</i></figcaption>
+</figure>
 
-<br />
-<br />
+Perform these two steps on all contacts before proceeding, so that they are ready for installation.
 
-Perform these two steps on all terminals before proceeding, so that they are ready for installation.
+Once all contacts are modified, install the first set onto the pins of a Nixie tube. Installing the contacts on the tube first and inserting the assembly as a whole makes
+it much easier to keep the contacts properly aligned. After the entire set of contacts is placed on the tube, align it with the PCB footprint using the base key, then
+carefully insert all contacts into their respective pads. This step requires some patience; tweezers are very helpful here.
 
-Once all terminals are modified, install the first set onto the pins of a Nixie tube. Installing the terminals on the tube first and inserting the assembly as a whole makes
-it much easier to keep the terminals properly aligned. After the entire set of terminals is placed on the tube, align it with the PCB footprint using the base key, then
-carefully insert all terminals into their respective pads. This step requires some patience; tweezers are very helpful here.
+Once all pins are fully inserted - ideally up to the retention springs - solder the contacts, remove the tube, and repeat the entire process for the remaining three Nixie tubes.
 
-Once all pins are fully inserted - ideally up to the retention springs - solder the terminals, remove the tube, and repeat the entire process for the remaining three Nixie tubes.
+After all the contacts have been soldered, install the neon bulbs, then insert Nixie tubes into the sockets.
 
-After all the terminals have been soldered, install the neon bulbs, then insert Nixie tubes into the sockets.
-
-#### Cleaning and final inspection
+#### PCB - cleaning and final inspection
 
 When the assembly is completed, clean the PCB thoroughly using isopropyl alcohol to remove any residual flux. Perform a careful final inspection: check for bad solder joints,
 accidental solder bridges or any potential shorts. Make sure all ICs are correctly oriented and look for any obvious mistakes before powering up the board.
 
-<img src="img/top_assembled.png" title="Fully assembled PCB - top view" alt="Fully assembled PCB - top view" width=480 />
-<figcaption><i>Fully assembled PCB - top view</i></figcaption>
+<figure>
+    <img src="img/top_assembled.png" title="Fully assembled PCB - top view" alt="Fully assembled PCB - top view" width=480 />
+    <figcaption><i>Fully assembled PCB - top view</i></figcaption>
+</figure>
 
-<br />
-<br />
+#### LPT cable
+
+To connect the device to the PC, an LPT-to-board connector cable is required. The wiring diagram is shown below.
+
+| DB-25 LPT pin    | PCB connector pin | Signal name |
+|------------------|-------------------|-------------|
+| 2                | 4                 | DATA        |
+| 3                | 3                 | CLOCK       |
+| 4                | 2                 | LATCH       |
+| 18-25 (pick one) | 1                 | GND         |
+
+On the PC side, a standard male DB-25 connector is used. On the board side, any 4-pin connector with a 2.54 mm pitch that fits the available space can be used. In my build, 
+I chose a Molex KK-254 series connector, mainly because I already had suitable parts left over from another project. The connector may also be omitted entirely, with the cable 
+soldered directly to the PCB.
+
+The cable itself must contain at least four conductors. I used a generic Cat 5e Ethernet cable, taking one wire from each twisted pair for the signal and connecting the 
+corresponding paired wire to ground. This arrangement helps reduce noise pickup on the control lines.
 
 ### Bring-up
 
-After the PCB is assembled and cleaned, the device is ready to be powered up for the first time. If the board has been assembled correctly,
-it should work without issues. During the initial power-up, the Nixie tube anode voltage must be set to 170V. This adjustment is performed only once.
+After the PCB is assembled and cleaned, the device is ready to be powered up for the first time. If the board was assembled correctly, it should work without issues. During 
+the initial power-up, the Nixie tube anode voltage must be set to 170V. This adjustment is performed only once.
 
 > [!CAUTION]
 > Reminder: high voltages (up to approx. 200V) are present on the PCB during this procedure. Neither the board nor any components should be touched while the device
@@ -221,7 +236,7 @@ will not exceed the target value.
 3. Connect a 9-12V power supply with a current rating of at least 0.5A to the `J1` connector, observing correct polarity. The circuit includes reverse-polarity
 protection, but it will not operate if the supply is connected backwards. If available, a bench power supply with adjustable current limiting is strongly recommended. 
 Set the current limit to 0.5A.
-4. Do not connect the control signals at this stage.
+4. Do not connect the control cable at this stage.
 5. Turn on the power supply. Some digits may begin to glow faintly - this is normal. Upon power-up, the output states of the SIPO register are undefined. Due to
 limitations of the 74HC595 reset mechanism (it clears only the shift register, not the output register), implementing a power-on reset circuit that guarantees all
 tubes are off would significantly increase circuit complexity. Since the display is not intended to operate without control signals, I've decided that this behavior
@@ -230,9 +245,9 @@ is acceptable.
 **If the voltage at `TP1` exceeds 250V and cannot be reduced using `RV1`, immediately turn off the power supply and verify the assembly of the boost converter's
 feedback loop. Continued operation at this voltage may cause `C4` to fail catastrophically.**
 7. Turn off the power supply.
-8. Connect the control signals.
+8. Connect the control cable between the LPT port and the board.
 9. Start the DOS TSR.
-10. Turn the power supply back on. If the board has been assembled correctly, the display should show the current RTC time, and the colon should blink once per second.
+10. Turn the power supply back on. If the board and the cable were assembled correctly, the display should show the current RTC time, and the colon should blink once per second.
 
 ### Known issues
 
@@ -256,9 +271,56 @@ Somehow, I ended up selecting a footprint with a 7.5mm pin pitch instead of 5mm,
 order for PCBs. As a result, typical 100nF ceramic disc capacitors are too narrow for the footprint, and their leads need to be bent to fit. I’ll likely fix this if
 I ever order another batch of PCBs, and (assuming the corrected version works as expected) I’ll update the design files.
 
-### Components list
+### Bill of Materials
 
-*In progress...*
+| Component type | Reference          | Description                                 | Quantity | Possible sources and notes                                          |
+|----------------|--------------------|---------------------------------------------|----------|---------------------------------------------------------------------|
+| PCB            | -                  | LPT Nixie Clock PCB                         | 1        | Your favourite PCB manufacturer                                     |
+| Capacitor      | C1, C6, C7, C9-C11 | 100nF ceramic                               | 6        | TME CC-100N                                                         |
+| Capacitor      | C2                 | 2.2nF ceramic or polyester                  | 1        | TME R82EC1220DQ50J                                                  |
+| Capacitor      | C3                 | 47pF 1kV ceramic                            | 1        | TME CCH-47P/1000V                                                   |
+| Capacitor      | C4                 | 4.7μF 250V electrolytic                     | 1        | TME PF2E4R7MNN0812                                                  |
+| Capacitor      | C5                 | 330μF electrolytic                          | 1        | TME PF1C331MNN0812                                                  |
+| Capacitor      | C8                 | 10μF electrolytic                           | 1        | TME CE-10/50PHT-Y                                                   |
+| Resistor       | R1                 | 56kΩ                                        | 1        | TME MBB02070C5602FCT00                                              |
+| Resistor       | R2                 | 1kΩ                                         | 1        | TME MRS25000C1001FCT00                                              |
+| Resistor       | R3                 | 10kΩ                                        | 1        | TME MRS25000C1002FCT00                                              |
+| Resistor       | R4                 | 2.2kΩ                                       | 1        | TME MRS25000C2201FCT00                                              |
+| Resistor       | R5                 | 330kΩ                                       | 1        | TME MBB02070C3303FCT00                                              |
+| Resistor       | R6                 | 820Ω                                        | 1        | TME MBB02070C8200FCT00                                              |
+| Resistor       | R7, R9, R13, R15   | 470Ω                                        | 4        | TME MF006JJ0471A50                                                  |
+| Resistor       | R8, R10, R14, R16  | 6.8kΩ                                       | 4        | TME MFFU2FF6801A50                                                  |
+| Resistor       | R11, R12           | 180kΩ                                       | 2        | TME MRS25000C1803FCT00                                              |
+| Resistor       | R17                | 0Ω                                          | 1        | Note: used only in prototype, install a jumper                      |
+| Trimpot        | RV1                | 2.2kΩ                                       | 1        | TME CA6V-2K2                                                        |
+| Diode          | D1                 | UF4007                                      | 1        | TME UF4007-DC                                                       |
+| Diode          | D2                 | 1N5817                                      | 1        | TME 1N5817-ST                                                       |
+| Inductor       | L1                 | 100μH 1A                                    | 1        | TME RLB0914-101KL                                                   |
+| Transistor     | Q1                 | BC547C                                      | 1        | TME BC547C-DIO                                                      |
+| Transistor     | Q2                 | IRF740                                      | 1        | TME IRF740PBF-BE3                                                   |
+| Optocoupler    | OK1-OK4            | CNY17-3                                     | 4        | TME CNY17-3X                                                        |
+| IC             | U1                 | NE555                                       | 1        | TME NE555P                                                          |
+| IC             | U2                 | 78L05                                       | 1        | TME AS78L05Z-E1                                                     |
+| IC             | U3                 | 4028                                        | 1        | TME CD4028BE                                                        |
+| IC             | U4, U5             | ULN2004A                                    | 2        | TME ULN2004A                                                        |
+| IC             | U6                 | 74HC595                                     | 1        | TME 74HC595N-TT                                                     |
+| IC             | U7                 | 74HCT74                                     | 1        | TME SN74HCT74N                                                      |
+| IC socket      | U1                 | 8-pin 300mil DIP socket                     | 1        | TME 1-2199298-2; Note: optional                                     |
+| IC socket      | U3-U6              | 16-pin 300mil DIP socket                    | 4        | TME ICVT-16P; Note: optional                                        |
+| IC socket      | U7                 | 14-pin 300mil DIP socket                    | 1        | TME ICVT-14P; Note: optional                                        |
+| Fuse           | F1                 | 500mA 250VAC 5x20mm slow-blow fuse          | 1        | TME UDA500MA250V                                                    |
+| Fuse socket    | F1                 | Fuse mounting contact                       | 2        | TME ZH8                                                             |
+| Connector      | J1                 | 2-pin 5mm 90° screw terminal block          | 1        | TME DG301-5.0-2P12                                                  |
+| Connector      | J2                 | Molex KK-254 4-pin PCB connector            | 1        | TME MX-6410-04A                                                     |
+| Neon bulb      | NE1, NE2           | Neon bulb w/o resistor                      | 2        | TME NEON-2                                                          |
+| Nixie tube     | V1-V4              | IN-1 or LC-516                              | 4        | eBay, Allegro etc.                                                  |
+| Contact        | V1-V4              | CD/HDD 5.08mm female power plug contact     | 44       | TME DFC01DR; Note: 11 pcs. for each tube; optional, but recommended |
+| Plug           | -                  | DB-25 male plug for cable                   | 1        | TME DSC-025; Note: for signal cable                                 |
+| Plug enclosure | -                  | DB-25 plug enclosure                        | 1        | TME DSC-225; Note: for signal cable                                 |
+| Plug           | -                  | Molex KK-254 4-pin cable connector          | 1        | TME MX-47054-1000; Note: for signal cable                           |
+| Contact        | -                  | Molex KK-254 contact                        | 4        | TME MX-4809C-P914L; Note: for signal cable                          |
+| Cable          | -                  | Any signal cable with at least 4 conductors | 1        | Note: for signal cable                                              |
+| Power supply   | -                  | 9-12VDC 0.5A power supply                   | 1        | TME POSC12100A-25                                                   |
 
 ## Software
 
