@@ -222,7 +222,7 @@ rtc_isr endp
 resident_end:
 
 ; ==== Non-resident variables ====
-startup_msg db 'LPT clock TSR',0Dh,0Ah,'(C) Lefucjusz, Warszawa 2025',0Dh,0Ah,'$'
+startup_msg db 'LPT clock TSR',0Dh,0Ah,'(C) Lefucjusz, Warszawa 2026',0Dh,0Ah,'$'
 success_msg db 'Clock TSR up and running!',0Dh,0Ah,'$'
 
 ; ==== Non-resident initialization code ====
@@ -246,6 +246,10 @@ init:
     in al, RTC_DATA_PORT                ; Read the register
     and al, NOT RTC_RS_MASK             ; Clear Rate Selector bits
     or al, RTC_RS_256HZ                 ; Set periodic interrupt rate to 256Hz
+    mov ah, al                          ; Store the updated value into AH
+    mov al, RTC_A_REG OR NMI_MASK       ; Select RTC register A, mask NMI
+    out RTC_INDEX_PORT, al
+    mov al, ah                          ; Store the updated value back into AL
     out RTC_DATA_PORT, al               ; Write to RTC
 
     mov al, RTC_B_REG OR NMI_MASK       ; Select RTC register B, mask NMI
@@ -253,6 +257,10 @@ init:
     in al, RTC_DATA_PORT                ; Read the register
     and al, NOT RTC_IE_MASK             ; Clear interrupt enable flags
     or al, RTC_PIE_BIT OR RTC_UIE_BIT   ; Enable periodic interrupt and update-ended interrupt
+    mov ah, al                          ; Store the updated value into AH
+    mov al, RTC_B_REG OR NMI_MASK       ; Select RTC register B, mask NMI
+    out RTC_INDEX_PORT, al
+    mov al, ah                          ; Store the updated value back into AL
     out RTC_DATA_PORT, al               ; Write to RTC
 
     ; Unmask IRQ8
